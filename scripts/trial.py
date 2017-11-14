@@ -55,28 +55,13 @@ def list_num(lis):
             return True
         except ValueError:
             return False
-#
-#def wage_del_vague_num(wage):
-#    """
-#    Delete rows with vague num in wage
-#    """
-#    wage_no_vague_num = []
-#    del_idx_vague_num = []   
-#    for i in range(len(wage)):
-#        wage_split_one = wage[i]
-#        numlist = [s for s in wage_split_one if s.isdigit()]
-#        if '1' in numlist and '2' in numlist:
-#            del_idx_vague_num.append(i)
-#        else:
-#            wage_no_vague_num.append(wage_split_one)
-#    return wage_no_vague_num, del_idx_vague_num
-
 
 def wage_del_vague_num(wage):
     """
     Delete rows with vague num in wage
     """
     wage_no_vague_num = []
+    wage_no_vague_num_mid = []
     del_idx_vague_num = []   
     for i in range(len(wage)):
         wage_split_one = wage[i]
@@ -84,7 +69,15 @@ def wage_del_vague_num(wage):
         if '1' in numlist and '2' in numlist:
             del_idx_vague_num.append(i)
         else:
-            wage_no_vague_num.append(wage_split_one)
+            wage_no_vague_num_mid.append(wage_split_one)
+    # some useless number in specific range still need to be deleted
+    for i in range(len(wage_no_vague_num_mid)):
+        wage_split_one = wage_no_vague_num_mid[i]
+        numlist = [s for s in wage_split_one if list_num(s)]
+        for j in numlist:
+            if 30 < float(j) < 600:
+                wage_split_one.remove(j)
+        wage_no_vague_num.append(wage_split_one)
     return wage_no_vague_num, del_idx_vague_num
 
 def wage_convert(wage):
@@ -107,7 +100,15 @@ def wage_convert(wage):
                 if j == '00':
                     wage_split_one.remove(j)
             wage_converted.append(wage_split_one)
-            
+        elif '30' in wage_split_one:
+            idx_half = wage_split_one.index('30')
+            if wage_split_one[idx_half-1] == ':':
+                time_new = str(int(wage_split_one[idx_half-2])+0.5)
+                del wage_split_one[idx_half]
+                del wage_split_one[idx_half-1]
+                wage_split_one[idx_half-2] = time_new
+                wage_converted.append(wage_split_one)
+                idx_converted.append(i)
         else:
             wage_converted.append(wage_split_one)
     return wage_converted, idx_converted
