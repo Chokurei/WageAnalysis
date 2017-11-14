@@ -48,6 +48,30 @@ def wage_del_vague_word(wage):
             wage_no_vague_word.append(wage_split_one)
     return wage_no_vague_word, del_idx_vague_word
 
+def list_num(lis):
+    for x in lis:
+        try:
+            float(x)
+            return True
+        except ValueError:
+            return False
+#
+#def wage_del_vague_num(wage):
+#    """
+#    Delete rows with vague num in wage
+#    """
+#    wage_no_vague_num = []
+#    del_idx_vague_num = []   
+#    for i in range(len(wage)):
+#        wage_split_one = wage[i]
+#        numlist = [s for s in wage_split_one if s.isdigit()]
+#        if '1' in numlist and '2' in numlist:
+#            del_idx_vague_num.append(i)
+#        else:
+#            wage_no_vague_num.append(wage_split_one)
+#    return wage_no_vague_num, del_idx_vague_num
+
+
 def wage_del_vague_num(wage):
     """
     Delete rows with vague num in wage
@@ -56,7 +80,7 @@ def wage_del_vague_num(wage):
     del_idx_vague_num = []   
     for i in range(len(wage)):
         wage_split_one = wage[i]
-        numlist = [s for s in wage_split_one if s.isdigit()]
+        numlist = [s for s in wage_split_one if list_num(s)]
         if '1' in numlist and '2' in numlist:
             del_idx_vague_num.append(i)
         else:
@@ -78,9 +102,32 @@ def wage_convert(wage):
             wage_split_one[idx_half-1] = time_new
             wage_converted.append(wage_split_one)
             idx_converted.append(i)
+        elif '00' in wage_split_one:
+            for j in wage_split_one:
+                if j == '00':
+                    wage_split_one.remove(j)
+            wage_converted.append(wage_split_one)
+            
         else:
             wage_converted.append(wage_split_one)
     return wage_converted, idx_converted
+
+def wage_bool(wage):
+    """
+    convert into bool number
+    """
+    wage_booled = []
+    for i in range(len(wage)):
+        wage_split_one = wage[i]
+        booled_list = [s for s in wage_split_one if list_num(s)]
+        for j in range(len(booled_list)):
+            if float(booled_list[j]) > 500:
+                booled_list[j] = '1'
+            else:
+                booled_list[j] = '0'
+        booled_str = ''.join(booled_list)
+        wage_booled.append(booled_str)
+    return wage_booled
             
 data_path = '../data/wage_analysis_ver02.csv'
 data = pd.read_csv(data_path, encoding = 'shift_jis')
@@ -90,10 +137,9 @@ wage = list(data_todo.values[:,-1])
 
 wage_split = wage_split_MeCab(wage)
 wage_no_vague_word, del_idx_vague_word = wage_del_vague_word(wage_split)
-wage_no_vague_num, del_idx_vague_num = wage_del_vague_word(wage_no_vague_word)
+wage_no_vague_num, del_idx_vague_num = wage_del_vague_num(wage_no_vague_word)
 wage_converted, idx_converted = wage_convert(wage_no_vague_num)
+wage_booled = wage_bool(wage_converted)
 
-
-    
-        
+                
         
