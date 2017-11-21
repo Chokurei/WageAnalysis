@@ -191,7 +191,7 @@ def pattern_print(wage):
         pattern_idx = wage_booled.index(pattern)
         print(pattern)
         print(wage_converted[pattern_idx])
-    
+
 data_path = '../data/wage_analysis_ver02.csv'
 result_path = '../result/'
 show_pattern = True
