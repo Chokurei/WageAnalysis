@@ -8,8 +8,9 @@ Created on Tue Nov 21 10:09:29 2017
 
 
 import pandas as pd
-import MeCab
+import MeCab, os
 import numpy as np
+from pattern_reconstruction import check_pattern_reconstruction
 
 wakachi = MeCab.Tagger("-O wakati")
 def tokenize(text):
@@ -192,8 +193,11 @@ def pattern_print(wage):
         print(wage_converted[pattern_idx])
     
 data_path = '../data/wage_analysis_ver02.csv'
-data = pd.read_csv(data_path, encoding = 'shift_jis')
-data_todo = data[['Unnamed: 0','rqmt_cmpny_nm_txt', 'sal_txt']]
+result_path = '../result/'
+show_pattern = True
+
+data_ori = pd.read_csv(data_path, encoding = 'shift_jis')
+data_todo = data_ori[['Unnamed: 0','rqmt_cmpny_nm_txt', 'sal_txt']]
 data_todo.columns = [['ID','name', 'salary']]
 ID = list(data_todo.values[:,0])
 wage = list(data_todo.values[:,-1])
@@ -204,14 +208,17 @@ wage_no_vague_num, id_no_vague_num = wage_del_vague_num(wage_no_vague_word, id_n
 wage_converted = wage_convert(wage_no_vague_num)
 wage_digit, wage_booled = wage_bool(wage_converted)
 
-#pattern_print(wage_booled)
+if show_pattern:
+    pattern_print(wage_booled)
 
-data = {'ID': id_no_vague_num, 'origin': wage_digit, 'pattern': wage_booled}
-output = pd.DataFrame(data=data)
+data_pattern_dict = {'ID': id_no_vague_num, 'origin': wage_digit, 'pattern': wage_booled}
+data_pattern = pd.DataFrame(data = data_pattern_dict )
 
-    
+data_ori = data_ori.rename(columns={'Unnamed: 0':'ID'})
+data_pattern_rec = check_pattern_reconstruction(data_pattern)
 
-
+output = pd.merge(data_pattern_rec, data_ori, on = 'ID', how= 'outer')
+output.to_csv(os.path.join(result_path,'output.csv'))
 
 
 
