@@ -218,7 +218,7 @@ data_ori = data_ori.rename(columns={'Unnamed: 0':'ID'})
 data_pattern_rec = check_pattern_reconstruction(data_pattern)
 
 output = pd.merge(data_pattern_rec, data_ori, on = 'ID', how= 'outer')
-output.to_csv(os.path.join(result_path,'output.csv'))
+output.to_csv(os.path.join(result_path,os.path.basename(data_path)[:-4] + '_output.csv'))
 
 
 
